@@ -3,6 +3,7 @@ package com.reactive.crud.cache;
 import com.reactive.crud.dto.ProductResponse;
 import io.quarkus.redis.datasource.ReactiveRedisDataSource;
 import io.quarkus.redis.datasource.value.ReactiveValueCommands;
+import io.quarkus.redis.datasource.value.SetArgs;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -27,17 +28,18 @@ public class ProductCacheService {
     public Uni<ProductResponse> get(Long productId) {
         String key = CACHE_KEY_PREFIX + productId;
         return cache.get(key)
-                .onItem().ifNotNull().invoke(product ->
-                        LOG.debugf("Cache HIT for product id: %d", productId)
-                )
-                .onItem().ifNull().invoke(() ->
-                        LOG.debugf("Cache MISS for product id: %d", productId)
-                );
+                .onItem().invoke(product -> {
+                    if (product != null) {
+                        LOG.debugf("Cache HIT for product id: %d", productId);
+                    } else {
+                        LOG.debugf("Cache MISS for product id: %d", productId);
+                    }
+                });
     }
 
     public Uni<Void> set(Long productId, ProductResponse product) {
         String key = CACHE_KEY_PREFIX + productId;
-        return cache.set(key, product, CACHE_TTL)
+        return cache.set(key, product, new SetArgs().ex(CACHE_TTL))
                 .replaceWithVoid()
                 .invoke(() -> LOG.debugf("Cached product id: %d", productId));
     }

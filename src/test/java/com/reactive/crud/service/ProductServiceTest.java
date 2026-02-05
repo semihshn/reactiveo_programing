@@ -70,9 +70,9 @@ class ProductServiceTest {
         // Then
         List<ProductResponse> products = subscriber.awaitItem().getItem();
         assertThat(products).hasSize(2);
-        assertThat(products.get(0).getId()).isEqualTo(1L);
-        assertThat(products.get(0).getName()).isEqualTo("Test Product");
-        assertThat(products.get(1).getId()).isEqualTo(2L);
+        assertThat(products.get(0).id()).isEqualTo(1L);
+        assertThat(products.get(0).name()).isEqualTo("Test Product");
+        assertThat(products.get(1).id()).isEqualTo(2L);
     }
 
     @Test
@@ -88,9 +88,9 @@ class ProductServiceTest {
         // Then
         ProductResponse response = subscriber.awaitItem().getItem();
         assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(1L);
-        assertThat(response.getName()).isEqualTo("Test Product");
-        assertThat(response.getPrice()).isEqualByComparingTo(new BigDecimal("99.99"));
+        assertThat(response.id()).isEqualTo(1L);
+        assertThat(response.name()).isEqualTo("Test Product");
+        assertThat(response.price()).isEqualByComparingTo(new BigDecimal("99.99"));
     }
 
     @Test
@@ -119,9 +119,9 @@ class ProductServiceTest {
 
         Product createdProduct = new Product(
                 3L,
-                request.getName(),
-                request.getDescription(),
-                request.getPrice(),
+                request.name(),
+                request.description(),
+                request.price(),
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
@@ -136,9 +136,9 @@ class ProductServiceTest {
         // Then
         ProductResponse response = subscriber.awaitItem().getItem();
         assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(3L);
-        assertThat(response.getName()).isEqualTo("New Product");
-        assertThat(response.getPrice()).isEqualByComparingTo(new BigDecimal("149.99"));
+        assertThat(response.id()).isEqualTo(3L);
+        assertThat(response.name()).isEqualTo("New Product");
+        assertThat(response.price()).isEqualByComparingTo(new BigDecimal("149.99"));
     }
 
     @Test
@@ -155,9 +155,9 @@ class ProductServiceTest {
 
         Product updatedProduct = new Product(
                 1L,
-                request.getName(),
-                request.getDescription(),
-                request.getPrice(),
+                request.name(),
+                request.description(),
+                request.price(),
                 sampleProduct.getCreatedAt(),
                 LocalDateTime.now()
         );
@@ -172,9 +172,9 @@ class ProductServiceTest {
         // Then
         ProductResponse response = subscriber.awaitItem().getItem();
         assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(1L);
-        assertThat(response.getName()).isEqualTo("Updated Product");
-        assertThat(response.getPrice()).isEqualByComparingTo(new BigDecimal("199.99"));
+        assertThat(response.id()).isEqualTo(1L);
+        assertThat(response.name()).isEqualTo("Updated Product");
+        assertThat(response.price()).isEqualByComparingTo(new BigDecimal("199.99"));
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.reactive.crud.performance;
 
 import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.subscription.BackPressureStrategy;
 import org.junit.jupiter.api.Test;
 
@@ -43,7 +44,7 @@ public class BackpressureTest {
                 .onItem().transformToUniAndConcatenate(item -> {
                     long start = System.currentTimeMillis();
                     // Simulate slow consumer (her item 50ms)
-                    return Multi.createFrom().item(item)
+                    return Uni.createFrom().item(item)
                             .onItem().delayIt().by(Duration.ofMillis(50))
                             .onItem().invoke(() -> {
                                 long end = System.currentTimeMillis();
@@ -83,13 +84,13 @@ public class BackpressureTest {
                     produced.incrementAndGet();
                     System.out.printf("📦 Produced: %d%n", item);
                 })
-                .onOverflow().drop(item -> {
+                .onOverflow().invoke(item -> {
                     dropped.incrementAndGet();
                     System.out.printf("   ❌ DROPPED: %d (Total dropped: %d)%n", item, dropped.get());
-                })
+                }).drop()
                 .emitOn(runnable -> new Thread(runnable).start())
                 .onItem().transformToUniAndConcatenate(item ->
-                        Multi.createFrom().item(item)
+                        Uni.createFrom().item(item)
                                 .onItem().delayIt().by(Duration.ofMillis(100)) // Very slow consumer
                                 .onItem().invoke(() -> {
                                     consumed.incrementAndGet();
@@ -130,7 +131,7 @@ public class BackpressureTest {
                 })
                 .onOverflow().dropPreviousItems() // LATEST strategy
                 .onItem().transformToUniAndConcatenate(item ->
-                        Multi.createFrom().item(item)
+                        Uni.createFrom().item(item)
                                 .onItem().delayIt().by(Duration.ofMillis(100)) // Slow consumer
                                 .onItem().invoke(val -> {
                                     consumed.add(val);
@@ -176,7 +177,7 @@ public class BackpressureTest {
                     System.out.printf("\n🔄 Processing Batch #%d (size: %d)%n", batchNum, batch.size());
 
                     // Simulate database batch insert (200ms per batch)
-                    return Multi.createFrom().item(batch)
+                    return Uni.createFrom().item(batch)
                             .onItem().delayIt().by(Duration.ofMillis(200))
                             .onItem().invoke(processedBatch -> {
                                 long batchEnd = System.currentTimeMillis();
@@ -237,7 +238,7 @@ public class BackpressureTest {
         // Slow consumer
         Multi.createFrom().iterable(buffer)
                 .onItem().transformToUniAndConcatenate(item ->
-                        Multi.createFrom().item(item)
+                        Uni.createFrom().item(item)
                                 .onItem().delayIt().by(Duration.ofMillis(1))
                                 .onItem().invoke(() -> consumed.incrementAndGet())
                 )

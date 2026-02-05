@@ -116,9 +116,9 @@ class ProductResourceTest {
 
         ProductResponse createdResponse = new ProductResponse(
                 3L,
-                request.getName(),
-                request.getDescription(),
-                request.getPrice(),
+                request.name(),
+                request.description(),
+                request.price(),
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
@@ -168,10 +168,10 @@ class ProductResourceTest {
 
         ProductResponse updatedResponse = new ProductResponse(
                 1L,
-                request.getName(),
-                request.getDescription(),
-                request.getPrice(),
-                sampleResponse.getCreatedAt(),
+                request.name(),
+                request.description(),
+                request.price(),
+                sampleResponse.createdAt(),
                 LocalDateTime.now()
         );
 
